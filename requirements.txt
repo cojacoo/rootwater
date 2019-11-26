@@ -1,0 +1,7 @@
+numpy
+pandas
+nose
+scipy
+statsmodels
+astral
+hydroeval
