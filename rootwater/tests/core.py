@@ -1,39 +1,41 @@
 import unittest
 
+import os
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
 
-import rootwater 
+from rootwater import rw, sf
 
-# read references
-SMtest = pd.read_csv('tests/SM_test.csv',index_col=0)
-SMtest.index = pd.to_datetime(SMtest.index)
+# get the basebath for test reference files
+BASEPATH = os.path.abspath(os.path.dirname(__file__))
 
-RWUtest = pd.read_csv('tests/RWU_test.csv',index_col=0)
-RWUtest.index = pd.to_datetime(RWUtest.index)
-
-SFtest = pd.read_csv('tests/SF_test.csv',index_col=0)
-SFtest.index = pd.to_datetime(SFtest.index)
-
-SVtest = pd.read_csv('tests/SV_test.csv',index_col=0)
-SVtest.index = pd.to_datetime(SVtest.index)
-
+def _read_helper(fname):
+    df = pd.read_csv(os.path.join(BASEPATH, fname),index_col=0)
+    df.index = pd.to_datetime(df.index)
+    return df
 
 
 class TestIt(unittest.TestCase):
+    def setUp(self):
+        # read references
+        self.SMtest = _read_helper('SM_test.csv')
+        self.RWUtest = _read_helper('RWU_test.csv')
+        self.SFtest = _read_helper('SF_test.csv')
+        self.SVtest = _read_helper('SV_test.csv')
+
     def test_RWU(self):
         assert_almost_equal(
-            pd.concat(rw.dfRWUc(SMtest)).dropna().values,
-            RWUtest.values,
+            pd.concat(rw.dfRWUc(self.SMtest)).dropna().values,
+            self.RWUtest.values,
             decimal=2
             )
         
 
     def test_SF(self):
         assert_almost_equal(
-            sf.sap_calc(SVtest,32.,'beech').values,
-            SFtest.values,
+            sf.sap_calc(self.SVtest,32.,'beech').values,
+            self.SFtest.values,
             decimal=2
         )
 
