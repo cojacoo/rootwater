@@ -90,7 +90,7 @@ def gebauer_act(r,perc=0.95,tree='beech'):
         return dummy
 
 
-def sap_volume(r,s1,s2,vout=False,tree='beech'):
+def sap_volume(r,s1,s2,vout=False,perc=0.95,tree='beech'):
     '''
     Fitting of Gebauer-Weibull function to measured sap velocity in order to return an estimate of the sap flux for the inner sap velocity measurement
 
@@ -110,9 +110,9 @@ def sap_volume(r,s1,s2,vout=False,tree='beech'):
     
     res = minimize_scalar(aply_geb)
     dummy = res.x*gebauer_rel(r,tree)
-    v3 = dummy[(np.arange(50)/50.*gebauer(r,tree) > 2.4) & (np.arange(50)/50.*gebauer(r,tree) <= gebauer_act(r,tree))]
+    v3 = dummy[(np.arange(50)/50.*gebauer(r,tree) > 2.4) & (np.arange(50)/50.*gebauer(r,tree) <= gebauer_act(r,perc,tree))]
     
-    rx = (np.arange(50)/50.*gebauer(r,tree))[(np.arange(50)/50.*gebauer(r,tree) > 2.4) & (np.arange(50)/50.*gebauer(r,tree) <= gebauer_act(r,tree))]
+    rx = (np.arange(50)/50.*gebauer(r,tree))[(np.arange(50)/50.*gebauer(r,tree) > 2.4) & (np.arange(50)/50.*gebauer(r,tree) <= gebauer_act(r,perc,tree))]
     Ax = rx*np.nan
     for i in np.arange(len(Ax)):
         Ax = A_circ(r,[rx[i]-0.01*gebauer(r,tree),rx[i]+0.01*gebauer(r,tree)])
