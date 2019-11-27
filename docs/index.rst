@@ -6,10 +6,27 @@
 Welcome to Rootwater's documentation!
 =====================================
 
+.. image:: https://travis-ci.org/cojacoo/rootwater.svg?branch=master
+    :target: https://travis-ci.org/cojacoo/rootwater
+
+.. image:: https://readthedocs.org/projects/rootwater/badge/?version=latest
+    :target: http://rootwater.readthedocs.io/en/latest/?badge=latest
+
+.. image:: https://codecov.io/gh/cojacoo/rootwater/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/cojacoo/rootwater
+
+This is the documentation for the rootwater package intended as Python toolbox for calculation of root water uptake (RWU) from measured soil moisture dynamics in the rhizosphere.
+
+.. _rootwater: https://github.com/cojacoo/rootwater
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+    installation
+    rootwater
+    sapflow
+    references
 
 
 Indices and tables

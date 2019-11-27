@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Rootwater'
+project = 'rootwater'
 copyright = '2019, Conrad Jackisch'
-author = 'Conrad Jackisch'
+author = 'Conrad Jackisch (c.jackisch_aT_tu-braunschweig.de)'
 
 
 # -- General configuration ---------------------------------------------------
