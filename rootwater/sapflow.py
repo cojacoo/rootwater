@@ -136,11 +136,12 @@ def A_circ(r,sens=[0.,1.1],tree='beech'):
     return np.pi*((r-sens[0])**2) - np.pi*((r-sens[1])**2)
 
 
-def sap_calc(SV,r,tree='beech'):
+def sap_calc(SV,r,perc=0.95,tree='beech'):
     ''' 
     Wrapper for sap flow calculation
     SV :: dataframe of sap velocity (cm/h) of East30 sensors with three columns ordered 'inner', 'mid', 'outer'
     r  :: radius as breast height (cm)
+    perc :: percentile for passive sapwood
     tree :: trivial tree species name for Gebauer and Roessler parameters
 
     returns sap flow data frame
@@ -149,7 +150,7 @@ def sap_calc(SV,r,tree='beech'):
     Sap = SV.copy()*np.nan
     colx = SV.columns[:3]
     for i in Sap.index:
-        Sap.loc[i,colx[0]] = sap_volume(r,SV.loc[i,colx[1]],SV.loc[i,colx[0]],False,tree)
+        Sap.loc[i,colx[0]] = sap_volume(r,SV.loc[i,colx[1]],SV.loc[i,colx[0]],False,perc,tree)
         Sap.loc[i,colx[1]] = SV.loc[i,colx[1]]*A_circ(r1,[1.1,2.4],tree)
         Sap.loc[i,colx[2]] = SV.loc[i,colx[2]]*A_circ(r1,[0.,1.1],tree)
 

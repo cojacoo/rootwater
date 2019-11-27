@@ -34,7 +34,7 @@ class TestIt(unittest.TestCase):
 
     def test_SF(self):
         assert_almost_equal(
-            sf.sap_calc(self.SVtest,32.,'beech').values,
+            sf.sap_calc(self.SVtest,32.,0.95,'beech').values,
             self.SFtest.values,
             decimal=2
         )
