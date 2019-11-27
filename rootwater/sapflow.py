@@ -151,8 +151,8 @@ def sap_calc(SV,r,perc=0.95,tree='beech'):
     colx = SV.columns[:3]
     for i in Sap.index:
         Sap.loc[i,colx[0]] = sap_volume(r,SV.loc[i,colx[1]],SV.loc[i,colx[0]],False,perc,tree)
-        Sap.loc[i,colx[1]] = SV.loc[i,colx[1]]*A_circ(r1,[1.1,2.4],tree)
-        Sap.loc[i,colx[2]] = SV.loc[i,colx[2]]*A_circ(r1,[0.,1.1],tree)
+        Sap.loc[i,colx[1]] = SV.loc[i,colx[1]]*A_circ(r,[1.1,2.4],tree)
+        Sap.loc[i,colx[2]] = SV.loc[i,colx[2]]*A_circ(r,[0.,1.1],tree)
 
     return Sap
 
