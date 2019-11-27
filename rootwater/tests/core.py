@@ -7,16 +7,16 @@ from numpy.testing import assert_almost_equal
 import rootwater 
 
 # read references
-SMtest = pd.read_csv('SM_test.csv',index_col=0)
+SMtest = pd.read_csv('tests/SM_test.csv',index_col=0)
 SMtest.index = pd.to_datetime(SMtest.index)
 
-RWUtest = pd.read_csv('RWU_test.csv',index_col=0)
+RWUtest = pd.read_csv('tests/RWU_test.csv',index_col=0)
 RWUtest.index = pd.to_datetime(RWUtest.index)
 
-SFtest = pd.read_csv('SF_test.csv',index_col=0)
+SFtest = pd.read_csv('tests/SF_test.csv',index_col=0)
 SFtest.index = pd.to_datetime(SFtest.index)
 
-SVtest = pd.read_csv('SV_test.csv',index_col=0)
+SVtest = pd.read_csv('tests/SV_test.csv',index_col=0)
 SVtest.index = pd.to_datetime(SVtest.index)
 
 
