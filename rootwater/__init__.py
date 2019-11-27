@@ -1,2 +1,2 @@
-from .rootwater import rootwater as rw
-from .rootwater import sapflow as sf
+from . import rootwater as rw
+from . import sapflow as sf
