@@ -1,29 +1,96 @@
+"""
+The Sap flow toolbox
+====================
+
+sapwood functions to estimate active sapwood area for sap velocity conversion
+
+.. note::
+    Introduction to sapflow toolbox. Bla bla.
+
+"""
+import json
+import os
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
-#sapwood functions to estimate active sapwood area for sap velocity conversion
+GP_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'gebauer_params.json'))
 
 def roessler(r, tree='beech'):
-    #estimate bark thickness
-    #Rössler, G.: Rindenabzug richtig bemessen, Forstzeitung, 4, p. 21, 2008.
+    r"""Estimate bark thickness
+
+    Returns the estimated bark thickness as published by Rössler (2008)
+    Rössler, G.: Rindenabzug richtig bemessen, Forstzeitung, 4, p. 21, 2008.
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in mm?)
+    tree : str
+        Tree name, for which to calculate bark thickness.
+        Can be one of ['beech', 'oak']
+
+    Returns
+    -------
+    db : float
+        bark thickness
+    
+    Raises
+    ------
+    NotImplementedError : if tree is not in ('oak', 'beech')
+
+    References
+    ----------
+    Rössler, G.: Rindenabzug richtig bemessen, Forstzeitung, 4, p. 21, 2008.
+    """
     if tree=='beech':
-        db = 2.61029 + 0.28522 * 2 *r
+        db = 2.61029 + 0.28522 * 2 * r
     elif tree=='oak':
         db = 9.88855 + 0.56734 * 2 * r
+    else:
+        raise NotImplementedError("Only 'beech' and 'oak' supported.")
     
-    return db/10
+    return db / 10
 
 
 def gebauer(r, tree='beech'):
-    #estimate sap-wood thickness
-    #Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux density patterns and sapwood area among seven co-occurring temperate broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
-    #r :: radius of tree at breast height
-    r = r - roessler(r, tree='beech')/2.
+    r"""Sop-wood thickness
+
+    Calculates sap-wood thickness as published by Gebauer et al. (2008)
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in mm?)
+    tree : str
+        Tree name, for which to calculate bark thickness.
+        Can be one of ['beech', 'oak']
+
+    Returns
+    -------
+    th : float
+        sap-wood thickness (in mm?)
+
+    Raises
+    ------
+    NotImplementedError : if tree is not in ('oak', 'beech')
+
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
+    """
+    r = r - roessler(r, tree=tree) / 2.
+    
     if tree=='beech':
         As = 0.778 * (2*r)**1.917
     elif tree=='oak':
         As = 0.065 * (2*r)**2.264
+    else:
+        raise NotImplementedError("Only 'beech' and 'oak' supported.")
+    
     return -1.*(np.sqrt((np.pi*r**2 - As)/np.pi)-r)
 
 
@@ -31,24 +98,66 @@ def gebauer_weibull(x,a,b,c,d):
     #Weibull function with 4 tree-specific parameters abcd
     return (c-1)/c + (a*((c-1)/c)**((c-1)/c))*np.exp(-1.*((x-d)/b + (c-1/c)**(1/c))**c) * ((x-d)/b + (c-1/c)**(1/c))**(c-1)
 
-#Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux density patterns and sapwood area among seven co-occurring temperate broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
-#Parameters for 4-parameter Weibull distribution of sap velocity distribution in sapwood
-gp = {
-      'beech': {'name':'Fagus sylvatica', 'a': 2.69, 'b': 3.42, 'c': 1.00, 'd': 2.44},
-      'hornbeam': {'name':'Carpinus betulus', 'a': 1.37, 'b': 5.88, 'c': 2.43, 'd': 2.79},
-      'limeA': {'name':'Tilia sp. (A)', 'a': 1.62, 'b': 6.35, 'c': 2.71, 'd': 3.28},
-      'limeB': {'name':'Tilia sp. (B)', 'a': 1.11, 'b': 4.52, 'c': 1.67, 'd': 1.88},
-      'sycamoremaple': {'name':'Acer pseudoplatanus', 'a': 1.44, 'b': 8.98, 'c': 3.47, 'd': 3.42},
-      'maple': {'name':'Acer campestre', 'a': 1.74, 'b': 4.86, 'c': 1.94, 'd': 2.50},
-      'ash': {'name':'Fraxinus excelsior', 'a': 1.00, 'b': 1.44, 'c': 1.54, 'd': 0.42}
-     }
 
-def gebauer_rel(r, tree='beech'):
-    #relative flux density as function of depth on sapwood
-    #r :: radius of tree at breast height
-    #returns flux distribution at 50 points along tree radius
-    x=np.arange(50)/50.*gebauer(r)
-    return gebauer_weibull(x,gp[tree]['a'],gp[tree]['b'],gp[tree]['c'],gp[tree]['d'])
+def get_default_gp():
+    r"""read default gp
+
+    Loads default Weibull distribution parameters as published by 
+    Gebauer et al. (2008). Can be used by 
+    :func:`gebauer_weibull <rootwater.sf.gebauer_weibull>` to 
+    calculate sap velocity distribution in sapwood
+
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
+    """
+    with open(GP_PATH, 'r') as fs:
+        params = json.load(fs)
+    
+    # if needed, you could validate the params here
+    return params
+
+# TODO: if the gebauer_rel does not get called too often
+# you could also move this line into the function.
+gp = get_default_gp()
+
+def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
+    r"""relative flux density
+
+    Calculates relative flux density as a function 
+    of depth on sapwood for n_points. 
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in mm?)
+    tree : str
+        Tree name, for which to calculate bark thickness.
+        Tree name has to be in gp.keys()
+    gp : dict
+        dictionary for all valid tree names. Each name 
+        has to be key to a nested dict that defines the 
+        four Weibull parameters a,b,c,d
+    n_points : int
+        Number of points for solving Weibull. 
+        This is the resolution over depth.
+
+    Returns
+    -------
+    sv : numpy.ndarray
+        relative flux density at n_points
+
+    """
+    # get the depths to evaluate
+    x=np.arange(n_points)/ n_points *gebauer(r)
+    p = gp.get(tree)
+
+    if p is None:
+        raise ValueError('Tree %s is unknown' % tree)
+    return gebauer_weibull(x, p['a'], p['b'], p['c'], p['d'])
 
 
 def recko(r,hydra=False):
