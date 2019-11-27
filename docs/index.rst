@@ -20,13 +20,14 @@ This is the documentation for the rootwater package intended as Python toolbox f
 .. _rootwater: https://github.com/cojacoo/rootwater
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 3
+    :caption: Contents:
 
     installation
     rootwater
     sapflow
-    references
+    examples/examples
+    reference
 
 
 Indices and tables

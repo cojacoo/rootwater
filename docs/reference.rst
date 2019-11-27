@@ -1,15 +1,17 @@
-=============
 API Reference
 =============
 
-
-.. toctree::
-    :maxdepth: 2
-
-
 The science behind this toolbox is described in Jackisch et al. (2019)
 
-Examples
-============
+Rootwater functions
+===================
 
-Check the examples folder and the Jupyter notebook there.
+.. note::
+
+    This section is under construction
+
+Sapflow
+=======
+
+.. automodule:: rootwater.sapflow
+    :members:
