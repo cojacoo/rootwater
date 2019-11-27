@@ -1,1 +1,1 @@
-from .core import TestMyModel
+from .core import TestIt
