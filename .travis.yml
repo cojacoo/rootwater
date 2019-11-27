@@ -1,9 +1,10 @@
-sudo: required
+os: linux, macos
 language: python
 python:
   - 3.4
   - 3.5
   - 3.6
+  - 3.7
 
 before_install:
   - "export DISPLAY=:99.0"
@@ -11,7 +12,7 @@ before_install:
 
 install:
   - pip install --upgrade pip
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then pip install numpy==1.11.3 pandas==0.19.2; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install numpy>=1.11.3 pandas>=0.19.2; fi
   - pip install -r requirements.txt
   - pip install .
   - pip install codecov
