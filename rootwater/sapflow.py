@@ -27,12 +27,12 @@ trees to entire forest stands, Trees, 18(5), 529–546, doi:10.1007/s00468-004-0
 """
 import json
 import sys
+import os
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
-# get the depths to evaluate
-sys.path.append('./')
+sys.path.append(os.path.dirname(__file__))
 from gebauer_params import gp
 #gp : dictionary for all valid tree names. Each name 
 #    has to be key to a nested dict that defines the 
@@ -423,6 +423,7 @@ def sap_calc(SV,r,perc=0.95,tree='beech'):
 
 
 def stackplot(A):
+    import matplotlib.pyplot as plt
     r"""plot stacked time series (of first three columns of the provided dataframe)
 
     
@@ -451,7 +452,7 @@ def stackplot(A):
     
     tableau10=tableau20[0::2]
 
-    fill_between(A.index,A.iloc[:,2],facecolor=tableau10[0],alpha=0.7,color='b',lw=0,label=A.columns[2])
-    fill_between(A.index,A.iloc[:,[1,2]].sum(axis=1),A.iloc[:,2],facecolor=tableau10[2],alpha=0.7,color='g',lw=0,label=A.columns[1])
-    fill_between(A.index,A.iloc[:,:3].sum(axis=1),A.iloc[:,[1,2]].sum(axis=1),facecolor=tableau10[3],alpha=0.7,color='y',lw=0,label=A.columns[0])
+    plt.fill_between(A.index,A.iloc[:,2],facecolor=tableau10[0],alpha=0.7,color='b',lw=0,label=A.columns[2])
+    plt.fill_between(A.index,A.iloc[:,[1,2]].sum(axis=1),A.iloc[:,2],facecolor=tableau10[2],alpha=0.7,color='g',lw=0,label=A.columns[1])
+    plt.fill_between(A.index,A.iloc[:,:3].sum(axis=1),A.iloc[:,[1,2]].sum(axis=1),facecolor=tableau10[3],alpha=0.7,color='y',lw=0,label=A.columns[0])
 
