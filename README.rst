@@ -40,6 +40,7 @@ The documentation can be found at: http://rootwater.readthedocs.io
 
 This toolbox is written as a Python module. 
 You can install it through pip: 
+
 .. code-block:: bash
 
   pip install rootwater
