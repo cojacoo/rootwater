@@ -7,4 +7,4 @@ Some examples can be found below:
     :maxdepth: 1
     :caption: Cases:
 
-    Code from Jackisch et at. 2019 <RWU_SF_Paper>
+    RWU and SF as calculated in Jackisch et al. 2019 <RWU_SF_Paper>
