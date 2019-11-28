@@ -11,6 +11,9 @@ For referencing to sap velocity measurements, a collection of conversion tools t
 <hr>
 The documentation can be found at: http://rootwater.readthedocs.io 
 <br>
-This toolbox is written as a Python module.
+This toolbox is written as a Python module. If you use this package, please cite the research behind it: 
+
+Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): Estimates of tree root water uptake from soil moisture profile dynamics. 
+Submitted to Biogeosciences. (DOI forthcoming)
 <br>
 

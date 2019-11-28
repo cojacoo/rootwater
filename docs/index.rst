@@ -31,8 +31,8 @@ Submitted to Biogeosciences. (DOI forthcoming)
     :caption: Contents:
 
     installation
-    rootwater
-    sapflow
+    rootwaterd
+    sapflowd
     examples/examples
     reference
 
