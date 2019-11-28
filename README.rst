@@ -21,6 +21,9 @@ Info: rootwater is developed with Python >= 3.7
     :target: https://codecov.io/gh/cojacoo/rootwater
     :alt: Codecov
 
+.. image:: https://zenodo.org/badge/224230245.svg
+   :target: https://zenodo.org/badge/latestdoi/224230245
+
 
 Abstract
 --------
