@@ -1,7 +1,5 @@
 The sap flow toolbox
 ====================
 
-
-.. note::
-
-    This section is under construction
+.. automodule:: rootwater.sapflow
+    :members: auto

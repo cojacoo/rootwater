@@ -1,6 +1,5 @@
 Rootwater uptake
 ================
 
-.. note::
-
-    This section is under construction
+.. automodule:: rootwater.rootwater
+    :members: auto
