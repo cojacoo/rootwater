@@ -31,8 +31,6 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
-GP_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'gebauer_params.json'))
-
 def roessler(r, tree='beech'):
     r"""Estimate bark thickness
 
@@ -155,11 +153,8 @@ def get_default_gp():
     # if needed, you could validate the params here
     return params
 
-# TODO: if the gebauer_rel does not get called too often
-# you could also move this line into the function.
-gp = get_default_gp()
 
-def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
+def gebauer_rel(r, tree='beech', n_points=50):
     r"""relative flux density
 
     Calculates relative flux density as a function 
@@ -172,10 +167,6 @@ def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
     tree : str
         Tree name, for which to calculate Weibull function.
         Tree name has to be in gp.keys()
-    gp : dict
-        dictionary for all valid tree names. Each name 
-        has to be key to a nested dict that defines the 
-        four Weibull parameters a,b,c,d
     n_points : int
         Number of points for solving Weibull. 
         This is the resolution over depth.
@@ -193,7 +184,13 @@ def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
 
     """
     # get the depths to evaluate
+    from gebauer_params import gp
+    #gp : dictionary for all valid tree names. Each name 
+    #    has to be key to a nested dict that defines the 
+    #    four Weibull parameters a,b,c,d
+    
     x=np.arange(n_points)/ n_points *gebauer(r)
+    
     p = gp.get(tree)
 
     if p is None:
