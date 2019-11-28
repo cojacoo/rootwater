@@ -3,10 +3,10 @@ rootwater
 
 Info: rootwater is developed with Python >= 3.7
 
-.. image:: https://img.shields.io/badge/pypi%20package-0.2.7-green.svg
+.. image:: https://img.shields.io/badge/pypi%20package-0.1-green.svg
     :target: https://pypi.org/project/rootwater/0.1/
 
-.. image:: https://img.shields.io/badge/version-0.2.7-green.svg
+.. image:: https://img.shields.io/badge/version-0.1-green.svg
     :target: https://github.com/cojacoo/rootwater
 
 .. image:: https://travis-ci.org/cojacoo/rootwater.svg?branch=master
@@ -38,7 +38,8 @@ The documentation can be found at: http://rootwater.readthedocs.io
 This toolbox is written as a Python module. 
 You can install it through pip: 
 .. code-block:: bash
-	pip install rootwater
+
+  pip install rootwater
 
 
 How to cite
