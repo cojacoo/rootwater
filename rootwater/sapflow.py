@@ -26,7 +26,7 @@ trees to entire forest stands, Trees, 18(5), 529–546, doi:10.1007/s00468-004-0
 
 """
 import json
-import os
+import sys
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar

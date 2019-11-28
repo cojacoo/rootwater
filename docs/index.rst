@@ -41,7 +41,6 @@ Submitted to Biogeosciences. (DOI forthcoming)
     rootwaterd
     sapflowd
     examples/examples
-    reference
 
 
 Indices and tables
