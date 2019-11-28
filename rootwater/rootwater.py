@@ -10,12 +10,12 @@ presented in a case study by Jackisch et al. (in review)
 
 (cc) c.jackisch@tu-braunschweig.de
 
-.. disclaimer::
+.. note::
     This function is by no means complete nor exhaustive. Please regard it as 
     helper function which require throughout testing and deserve substantial
     extension to further application cases.
 
-.. get_started::
+.. note::
     For direct application (tested for TDR measurements at two beech stands) 
     use rootwater.rootwater.dfRWUc and provide a pandas.DataFrame with measured 
     soil moisture (in vol.%).

@@ -15,9 +15,16 @@ Welcome to Rootwater's documentation!
 .. image:: https://codecov.io/gh/cojacoo/rootwater/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/cojacoo/rootwater
 
-This is the documentation for the rootwater package intended as Python toolbox for calculation of root water uptake (RWU) from measured soil moisture dynamics in the rhizosphere.
+This is the documentation for the rootwater package intended as Python toolbox for calculation of root water uptake (RWU) from measured soil moisture dynamics in the rhizosphere. The general concept is an evaluation of observed diurnal soil moisture decrease and nocturnal stagnation or capillary-driven redistribution. 
+
+For referencing to sap velocity measurements, a collection of conversion tools to estimate sap flow in the active sapwood is included.
 
 .. _rootwater: https://github.com/cojacoo/rootwater
+
+If you use this package, please cite the research behind it: 
+
+Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): Estimates of tree root water uptake from soil moisture profile dynamics. 
+Submitted to Biogeosciences. (DOI forthcoming)
 
 .. toctree::
     :maxdepth: 3

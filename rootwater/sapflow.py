@@ -13,8 +13,8 @@ for sap velocity conversion to sap flow.
     helper functions which require throughout testing and deserve substantial
     extension to further application cases.
 
-.. get_started::
-    For direct application (tested for beech trees) use rootwater.sapflow.sap_calc
+.. note::
+    To get started and for direct application (tested for beech trees) use rootwater.sapflow.sap_calc
     and provide a pandas.DataFrame with measured sap velocity from East30 sensors 
     (in cm/h).
 
@@ -70,14 +70,14 @@ def roessler(r, tree='beech'):
 
 
 def gebauer(r, tree='beech'):
-    r"""Sop-wood thickness
+    r"""Sap-wood thickness
 
     Calculates sap-wood thickness as published by Gebauer et al. (2008)
 
     Parameters
     ----------
     r : float
-        tree radius at breast height (in mm?)
+        tree radius at breast height (in cm)
     tree : str
         Tree name, for which to calculate bark and sapwood thickness.
         Can be one of ['beech', 'oak']
@@ -85,7 +85,7 @@ def gebauer(r, tree='beech'):
     Returns
     -------
     th : float
-        sap-wood thickness (in mm?)
+        sap-wood thickness (in mm)
 
     Raises
     ------
