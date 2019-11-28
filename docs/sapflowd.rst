@@ -1,5 +1,5 @@
-.. autosummary::
-     :toctree: stubs
-     
+.. autosummary:: rootwater.sapflow
+     :toctree:
+
 .. automodule:: rootwater.sapflow
     :members:
