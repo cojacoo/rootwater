@@ -5,3 +5,6 @@ scipy
 statsmodels
 astral
 hydroeval
+sphinx>=1.4
+ipykernel
+nbsphinx
