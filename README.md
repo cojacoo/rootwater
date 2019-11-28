@@ -5,8 +5,12 @@
 [![codecov](https://codecov.io/gh/cojacoo/rootwater/branch/master/graph/badge.svg)](https://codecov.io/gh/cojacoo/rootwater)
 
 <hr>
-This is a small toolbox for root-water-uptake (RWU) calculation from changes in soil moisture in the rhizosphere. The approach is described in Jackisch et al. (2020) Estimates of tree root water uptake from soil moisture profile dynamics.
+This is a small toolbox for root-water-uptake (RWU) calculation from changes in soil moisture in the rhizosphere. The approach is described in Jackisch et al. (submitted to Biogeosciences). The general concept is an evaluation of observed diurnal soil moisture decrease and nocturnal stagnation or capillary-driven redistribution. 
 <hr>
-The documentation can be found at: http://rootwater.readthedocs.io <br>
+For referencing to sap velocity measurements, a collection of conversion tools to estimate sap flow in the active sapwood is included.
+<hr>
+The documentation can be found at: http://rootwater.readthedocs.io 
 <br>
-This toolbox is written as a Python module available via pip.
+This toolbox is written as a Python module.
+<br>
+
