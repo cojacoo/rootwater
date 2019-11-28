@@ -31,6 +31,14 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
+# get the depths to evaluate
+sys.path.append('./')
+from gebauer_params import gp
+#gp : dictionary for all valid tree names. Each name 
+#    has to be key to a nested dict that defines the 
+#    four Weibull parameters a,b,c,d
+
+
 def roessler(r, tree='beech'):
     r"""Estimate bark thickness
 
@@ -183,11 +191,6 @@ def gebauer_rel(r, tree='beech', n_points=50):
     broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
 
     """
-    # get the depths to evaluate
-    from gebauer_params import gp
-    #gp : dictionary for all valid tree names. Each name 
-    #    has to be key to a nested dict that defines the 
-    #    four Weibull parameters a,b,c,d
     
     x=np.arange(n_points)/ n_points *gebauer(r)
     
