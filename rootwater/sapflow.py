@@ -2,10 +2,27 @@
 The Sap flow toolbox
 ====================
 
-sapwood functions to estimate active sapwood area for sap velocity conversion
+Sap velocity and sap flow is a very interesting means to monitor xylem water 
+dynamics in higher plants (i.e. trees in our case). Since a mere flow conversion
+is likely to result in erroneous assumptions (Čermák et al., 2004), we have 
+compiled a couple of sapwood-related functions to estimate active sapwood area 
+for sap velocity conversion to sap flow.
 
 .. note::
-    Introduction to sapflow toolbox. Bla bla.
+    This toolbox is by no means complete nor exhaustive. Please regard it as 
+    helper functions which require throughout testing and deserve substantial
+    extension to further application cases.
+
+.. get_started::
+    For direct application (tested for beech trees) use rootwater.sapflow.sap_calc
+    and provide a pandas.DataFrame with measured sap velocity from East30 sensors 
+    (in cm/h).
+
+References
+----------
+Čermák, J., J. Kučera, and N. Nadezhdina (2004), Sap flow measurements with some 
+thermodynamic methods, flow integration within trees and scaling up from sample 
+trees to entire forest stands, Trees, 18(5), 529–546, doi:10.1007/s00468-004-0339-6.
 
 """
 import json
@@ -20,12 +37,11 @@ def roessler(r, tree='beech'):
     r"""Estimate bark thickness
 
     Returns the estimated bark thickness as published by Rössler (2008)
-    Rössler, G.: Rindenabzug richtig bemessen, Forstzeitung, 4, p. 21, 2008.
 
     Parameters
     ----------
     r : float
-        tree radius at breast height (in mm?)
+        tree radius at breast height (in cm)
     tree : str
         Tree name, for which to calculate bark thickness.
         Can be one of ['beech', 'oak']
@@ -33,7 +49,7 @@ def roessler(r, tree='beech'):
     Returns
     -------
     db : float
-        bark thickness
+        bark thickness (in mm)
     
     Raises
     ------
@@ -63,7 +79,7 @@ def gebauer(r, tree='beech'):
     r : float
         tree radius at breast height (in mm?)
     tree : str
-        Tree name, for which to calculate bark thickness.
+        Tree name, for which to calculate bark and sapwood thickness.
         Can be one of ['beech', 'oak']
 
     Returns
@@ -95,6 +111,25 @@ def gebauer(r, tree='beech'):
 
 
 def gebauer_weibull(x,a,b,c,d):
+    r"""4-parameter Weibull function after Gebauer
+
+    Calls Weibull distribution function as published by 
+    Gebauer et al. (2008).
+
+    Parameters
+    ----------
+    x : float or numpy.ndarray
+        realtive sampling points for distribution function
+    a, b, c, d : float
+        Weibull function parameters, which are tree-specific in this case
+
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
+    """
     #Weibull function with 4 tree-specific parameters abcd
     return (c-1)/c + (a*((c-1)/c)**((c-1)/c))*np.exp(-1.*((x-d)/b + (c-1/c)**(1/c))**c) * ((x-d)/b + (c-1/c)**(1/c))**(c-1)
 
@@ -133,9 +168,9 @@ def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
     Parameters
     ----------
     r : float
-        tree radius at breast height (in mm?)
+        tree radius at breast height (in cm)
     tree : str
-        Tree name, for which to calculate bark thickness.
+        Tree name, for which to calculate Weibull function.
         Tree name has to be in gp.keys()
     gp : dict
         dictionary for all valid tree names. Each name 
@@ -150,6 +185,12 @@ def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
     sv : numpy.ndarray
         relative flux density at n_points
 
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
     """
     # get the depths to evaluate
     x=np.arange(n_points)/ n_points *gebauer(r)
@@ -161,10 +202,30 @@ def gebauer_rel(r, tree='beech', gp=gp, n_points=50):
 
 
 def recko(r,hydra=False):
-    #estimate sap-wood thickness
-    #Račko, V., O. Mišíková, P. Hlaváč, and V. Deáková (2018), Can bark stripping cause red heartwood formation in beech stems? iForest - Biogeosciences and Forestry, 11(2), 251–258, doi:10.3832/ifor2147-011.
-    #r :: radius of tree at breast height
-    #returns sap-wood thickness
+    r"""sap-wood thickness after Račko et al. (2018)
+
+    Calculates sap-wood thickness as a function of the tree radius 
+    at breast height.
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in cm)
+    hydra : bool
+        selects if only the hydrated area is returned (when True)
+
+    Returns
+    -------
+    sapwood : float
+        sapwood thickness (in cm)
+    
+    References
+    ----------
+    Račko, V., O. Mišíková, P. Hlaváč, and V. Deáková (2018), 
+    Can bark stripping cause red heartwood formation in beech stems? 
+    iForest - Biogeosciences and Forestry, 11(2), 251–258, doi:10.3832/ifor2147-011.
+    """
+    
     if hydra:
         #only hydrated area
         return 0.34*r - 2.714
@@ -173,9 +234,26 @@ def recko(r,hydra=False):
 
 
 def galvac(r):
-    #estimate sap-wood thickness
-    #after Galvac et al. 1989
-    #r :: radius of tree at breast height
+    r"""sap-wood thickness after Galvac et al. (1990)
+
+    Calculates sap-wood thickness as a function of the tree radius 
+    at breast height.
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in cm)
+    
+    Returns
+    -------
+    sapwood : float
+        sapwood thickness (in cm)
+    
+    References
+    ----------
+    Glavac, V., Koenies, H. & Ebben, U. Holz als Roh- und Werkstoff (1990) 48: 437. https://doi.org/10.1007/BF02627628
+    """
+    
     #returns sap-wood thickness
     dbh = r*2
     As = 0.6546*dbh**2 + 0.5736*dbh - 40.069
@@ -183,32 +261,79 @@ def galvac(r):
 
 
 def gebauer_act(r,perc=0.95,tree='beech'):
-    '''
-    Estimate of active sapwood area based on percentile of Weibull distribution
+    r"""Active sapwood area based on percentile of Weibull distribution
+
+    Calculates the "zero" sap velocity limit as given percentile of relative 
+    flux velocity distribution as a Weibull function after Gebauer et al. (2008)
+
+    Parameters
+    ----------
+    r : float or numpy.ndarray
+        tree radius at breast height (in cm)
+    perc : float
+        percentile to define the "zero" sap velocity limit
+    tree : str
+        Tree name, for which to calculate Weibull function.
+        Tree name has to be in gp.keys()
     
-    r :: radius of the tree
-    perc :: percentile to localise transition to inactive sapwood 
-    returns depth of active sapwood
-    '''
+    Returns
+    -------
+    act_sap : float or numpy.ndarray
+        depth of "zero" sap velocity limit as active sapwood in tree (in cm)
+
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
+    """
     if type(r)==float:
         return np.where(np.cumsum(gebauer_rel(r,tree))/sum(gebauer_rel(r,tree))>perc)[0][0]/50.*gebauer(r,tree)
     else:
-        dummy = r*np.nan
+        act_sap = r*np.nan
         for i in np.arange(len(r))[1:]:
-            dummy[i] = np.where(np.cumsum(gebauer_rel(r[i],tree))/sum(gebauer_rel(r[i],tree))>perc)[0][0]/50.*gebauer(r[i],tree)
-        return dummy
+            act_sap[i] = np.where(np.cumsum(gebauer_rel(r[i],tree))/sum(gebauer_rel(r[i],tree))>perc)[0][0]/50.*gebauer(r[i],tree)
+        return act_sap
 
 
 def sap_volume(r,s1,s2,vout=False,perc=0.95,tree='beech'):
-    '''
-    Fitting of Gebauer-Weibull function to measured sap velocity in order to return an estimate of the sap flux for the inner sap velocity measurement
+    r"""Estimate sap flow from sap velocity in inner sapwood measured with East30 sensors
 
-    r :: radius of the tree
-    s1 :: value or time series of sap velocity measurements at mid point of East30 sensor
-    s2 :: value or time series of sap velocity measurements at inner point of East30 sensor
-    tree :: trivial tree species name for Gebauer parameters
-    vout :: True returns aggregated volume, False returns velocity distribution 
-    '''
+    Calculates the sap flow after Gebauer et al. (2008) based on sap velocity measurements 
+    by fitting of Gebauer-Weibull function to measured sap velocity at mid and inner point
+    through a scaling factor (but not changing the empirical, tree-specific parameters).
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in cm)
+    s1 : float or pandas.Series (datetime index is preferable)
+        sap velocity measurement at mid point of East30 sensor (cm/time)
+    s2 : float or pandas.Series (datetime index is preferable)
+        sap velocity measurement at inner point of East30 sensor (cm/time)
+    vout : bool
+        True returns aggregated volume flux (cm3/time), False returns velocity distribution (cm/time)
+    perc : float
+        percentile to define the "zero" sap velocity limit
+    tree : str
+        Tree name, for which to calculate bark thickness and Weibull function.
+        Tree name has to be in gp.keys()
+
+    Returns
+    -------
+    return : float or pandas.Series
+        aggregated volume flux (cm3/time) (if vout is True), or
+        returns velocity distribution (cm/time) (if vout is False)
+
+    References
+    ----------
+    Gebauer, T., Horna, V., and Leuschner, C.: Variability in radial sap flux
+    density patterns and sapwood area among seven co-occurring temperate 
+    broad-leaved tree species, Tree Physiol., 28, 1821–1830, 2008.
+
+    """
+
     xi = np.arange(50)/50.*gebauer(r,tree)
     
     def aply_geb(s1x):
@@ -231,31 +356,60 @@ def sap_volume(r,s1,s2,vout=False,perc=0.95,tree='beech'):
     else:
         return np.sum(Ax * v3)
 
+
 def A_circ(r,sens=[0.,1.1],tree='beech'):
-    '''
-    Calculate area of circular ring
-    r :: radius of tree at BH
-    sens :: list of two locations marking the ring (measured from outer perimeter)
-    tree :: can be beech or oak and refers to Roessler parameters
+    r"""Calculate area of circular ring
+
+    Simple geometrical calculation of a circular ring area as reference cross-section
+    for sap flow calculation.
+
+    Parameters
+    ----------
+    r : float
+        tree radius at breast height (in cm)
+    sens : list of floats
+        outer and inner point of ring (in cm)
+    tree : str
+        Tree name, for which to calculate and subtract bark thickness.
+        Can be one of ['beech', 'oak'].
+
+    Returns
+    -------
+    return : float
+        area of ring as 
+
+    """
     
-    returns area of circular reference sapwood
-    '''
     #East30 thermocouplers location at needles 5, 18 and 30 mm
     r = r - roessler(r, tree)/2. #correct for bark
     return np.pi*((r-sens[0])**2) - np.pi*((r-sens[1])**2)
 
 
 def sap_calc(SV,r,perc=0.95,tree='beech'):
-    ''' 
-    Wrapper for sap flow calculation
-    SV :: dataframe of sap velocity (cm/h) of East30 sensors with three columns ordered 'inner', 'mid', 'outer'
-    r  :: radius as breast height (cm)
-    perc :: percentile for passive sapwood
-    tree :: trivial tree species name for Gebauer and Roessler parameters
+    r"""Wrapper for sap flow calculation with rootwater.sapflow.sap_volume
 
-    returns sap flow data frame
-    '''
+    Calculates the sap flow after Gebauer et al. (2008) based on measured sap velocity 
+    with East30 sensors.
+    
+    Parameters
+    ----------
+    SV : pandas.DataFrame
+        sap velocity (in cm/h) in three columns ordered inner, mid, outer point
+    r : float
+        tree radius at breast height (in cm)
+    perc : float
+        percentile to define the "zero" sap velocity limit
+    tree : str
+        Tree name, for which to calculate bark thickness and Weibull function.
+        Tree name has to be in gp.keys()
 
+    Returns
+    -------
+    return : pandas.DataFrame
+        sap volume flux (cm3/h)
+
+    """
+    
     Sap = SV.copy()*np.nan
     colx = SV.columns[:3]
     for i in Sap.index:
@@ -269,6 +423,20 @@ def sap_calc(SV,r,perc=0.95,tree='beech'):
 
 
 def stackplot(A):
+    r"""plot stacked time series (of first three columns of the provided dataframe)
+
+    
+    Parameters
+    ----------
+    A : pandas.DataFrame (preferrably with datetime index)
+        DataFrame with three columns to be stacked
+    
+    Returns
+    -------
+    plot
+
+    """
+    
     #plot stacked time series of first three columns of the dataframe A
     # These are the "Tableau 20" colors as RGB.  
     tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),  
