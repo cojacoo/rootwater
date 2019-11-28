@@ -36,6 +36,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary',
     'nbsphinx',
 ]
 
@@ -50,6 +51,10 @@ master_doc = 'index'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# Autosummary
+autodoc_default_flags = ['members']
+autosummary_generate = True
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

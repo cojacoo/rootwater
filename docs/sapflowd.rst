@@ -1,6 +1,5 @@
-.. toctree::
-    :maxdepth: 2
-    :caption: Functions:
-
+.. autosummary::
+     :toctree: stubs
+     
 .. automodule:: rootwater.sapflow
     :members:

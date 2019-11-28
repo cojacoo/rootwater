@@ -8,8 +8,6 @@ developped a function to evaluate the step-shaped, diurnal changes in soil
 moisture to derive an estimate for RWU. The science behind this function is 
 presented in a case study by Jackisch et al. (in review)
 
-:envelope: c.jackisch_aT_tu-braunschweig.de
-
 .. note::
     This function is by no means complete nor exhaustive. Please regard it as 
     helper function which require throughout testing and deserve substantial
