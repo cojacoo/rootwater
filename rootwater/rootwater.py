@@ -1,4 +1,42 @@
-# coding=utf-8
+"""
+The root water uptake (RWU) toolbox
+===================================
+
+Root water uptake (RWU) can be inferred from soil moisture dynamics in the 
+rhizosphere (Feedes and van Dam, 2005; Guderle and Hildebrandt, 2015). We 
+developped a function to evaluate the step-shaped, diurnal changes in soil 
+moisture to derive an estimate for RWU. The science behind this function is 
+presented in a case study by Jackisch et al. (in review)
+
+(cc) c.jackisch@tu-braunschweig.de
+
+.. disclaimer::
+    This function is by no means complete nor exhaustive. Please regard it as 
+    helper function which require throughout testing and deserve substantial
+    extension to further application cases.
+
+.. get_started::
+    For direct application (tested for TDR measurements at two beech stands) 
+    use rootwater.rootwater.dfRWUc and provide a pandas.DataFrame with measured 
+    soil moisture (in vol.%).
+
+References
+----------
+Feddes, R. A., and J. C. van Dam (2005), PLANT–SOIL–WATER RELATIONS, 
+in Encyclopedia of Soils in the Environment, edited by D. Hillel, pp. 222–230, 
+Elsevier, Oxford.
+
+Guderle, M., and A. Hildebrandt (2015), Using measured soil water contents to 
+estimate evapotranspiration and root water uptake profiles – a comparative 
+study, Hydrol. Earth Syst. Sci., 19(1), 409–425, 
+doi:10.5194/hess-19-409-2015.
+
+Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): 
+Estimates of tree root water uptake from soil moisture profile dynamics. 
+Submitted to Biogeosciences. DOI to be added
+
+"""
+
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf 
@@ -10,31 +48,53 @@ import hydroeval as he
 # function to calculate change in soil moisture as root water uptake
 
 def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mintime=3.5):
-    '''
-    Calulate a daily root water uptake estimate from a soil moisture time series
-    (cc) c.jackisch@tu-braunschweig.de
+    r"""Calulate a daily root water uptake estimate from a soil moisture time series
+
+    Returns a data frame with time series of daily RWU estimates and daily evaluation
+    references after Jackisch et al. (in review)
+
+    Parameters
+    ----------
+    ts : pandas.DataFrame with time zone aware datetime index
+        time series of one soil moisture sensor (assumes vol.%) 
+        a relatively high temporal resolution of about 30 min or smaller is assumed
+    lat : float 
+        latitude of location (degree)
+    lon : float 
+        longitude of location (degree)
+    diffx : int
+        number of time steps to evaluate change in moisture to (spans window)
+    slope_diff : float
+        minimal difference factor of slope between night and day linear regession 
+        to evaluate step shape especially in case of night decrease of soil moisture
+    maxdiffs : float
+        maximum of soil moistue difference to assume no significant other water 
+        transport (some sort of threshold which could be the noise of the sensed data)
+    mintime : float
+        minmimal time of a day or night period (in h)
+
+    Returns
+    -------
+    RWU : pandas.DataFrame
+        returns a data frame with time series of daily RWU estimates and daily references:
+        rwu :: root water uptake with extrapolated night changes
+        rwu_nonight :: neglecting nocturnal changes
+        lm_night :: slope of linear model during night
+        lm_day :: slope of linear model during day
+        step_control :: control values (1111 means all criteria met)
+        evalx :: control values for time references
+        eval_nse :: control values for diurnal step shape as nash-sutcliffe efficiency 
+        tin :: start of previous night
+        tout :: start of day 
+        tix :: start of next night
     
-    ts :: time series of one soil moisture sensor (assumes vol.%) as a pandas series (requires high temporal resolution and a time zone aware index)
-    lat/lon :: latitude/longitude of location (degree)
     
-    further parameters:
-    diffx :: number of time steps to evaluate change in moisture to
-    slope_diff :: min difference factor of slope between night and day lin. regession (in case of night decrease)
-    maxdiffs :: max of soil moistue difference to assume no significant other water transport
-    mintime :: minmimal time of a day or night period (h)
-    
-    returns a data frame with time series of daily RWU estimates and daily references:
-    rwu :: root water uptake with extrapolated night changes
-    rwu_nonight :: neglecting nocturnal changes
-    lm_night :: slope of linear model during night
-    lm_day :: slope of linear model during day
-    step_control :: control values (1111 means all criteria met)
-    evalx :: control values for time references
-    eval_nse :: control values for diurnal step shape as nash-sutcliffe efficiency 
-    tin :: start of previous night
-    tout :: start of day 
-    tix :: start of next night
-    '''
+    References
+    ----------
+    Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): 
+    Estimates of tree root water uptake from soil moisture profile dynamics. 
+    Submitted to Biogeosciences. DOI to be added
+    """
     
     # use astral to get sunrise/sunset time references as a function of the date    
     l = Location()
@@ -174,14 +234,39 @@ def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mi
     return RWU
 
 def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True):
-    '''
-    Wrapper to quickly apply fRWU to a dataframe with soil moisture values.
-    dummyd :: input data frame with time stamp index and columns of soil moisture
-    tz :: tiime zone which is required for the astral solar reference
-    safeRWU :: flag if quality controls are applied when True
+    r"""Wrapper to quickly apply rootwater.rootwater.fRWU to a dataframe with soil moisture values.
+
+    Returns three dataframes with RWU, RWU_without nocturnal correction, step shape NSE
+    Warning: All parameters for the function rootwater.rootwater.fRWU are used as default!
     
-    returns three dataframes with RWU, RWU_without nocturnal correction, step shape NSE
-    '''
+    Parameters
+    ----------
+    dummyd : pandas.DataFrame with time zone aware datetime index
+        input data frame of columns of soil moisture (assumes vol.%) 
+        a relatively high temporal resolution of about 30 min or smaller is assumed
+    tz : str
+        time zone which is required for the astral solar reference and follows 
+        its nomenclature
+    safeRWU : bool
+        flag if quality controls are applied when True
+
+    Returns
+    -------
+    dummx : pandas.DataFrame
+        data frame with time series of daily RWU estimates with applied nocturnal correction
+    dummy : pandas.DataFrame
+        data frame with time series of daily RWU estimates WITHOUT nocturnal correction
+    dummc : pandas.DataFrame
+        data frame with time series of Nash-Sutcliff-Efficiency as evaluation of the
+        assumed step shape of the diurnal soil moisture dynamics. 
+    
+    References
+    ----------
+    Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): 
+    Estimates of tree root water uptake from soil moisture profile dynamics. 
+    Submitted to Biogeosciences. DOI to be added
+    """
+
     dummyd = dummyd.tz_localize(tz)
     dummyc = dummyd.columns
     
