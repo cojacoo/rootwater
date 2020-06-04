@@ -28,7 +28,7 @@ How to cite
 If you use this package, please cite the research behind it: 
 
 Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): Estimates of tree root water uptake from soil moisture profile dynamics. 
-Submitted to Biogeosciences. (DOI forthcoming)
+Biogeosciences Discuss., https://doi.org/10.5194/bg-2019-466
 
 ✉ c.jackisch_aT_tu-braunschweig.de
 

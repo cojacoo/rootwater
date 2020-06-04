@@ -49,8 +49,8 @@ You can install it through pip:
 How to cite
 -----------
 
-If you use this package, please cite the research behind it: 
+If you use this package, please see and cite the research behind it: 
 
-  Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): Estimates of tree root water uptake from soil moisture profile dynamics. Submitted to Biogeosciences. (DOI forthcoming)
+  Jackisch, C., Knoblauch, S., Blume, T., Zehe, E. and Hassler, S.K. (in review): Estimates of tree root water uptake from soil moisture profile dynamics. Biogeosciences Discuss., in review, https://doi.org/10.5194/bg-2019-466
 
 
