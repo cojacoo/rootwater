@@ -3,7 +3,7 @@ pandas
 nose
 scipy
 statsmodels
-astral
+astral>=2.0
 hydroeval
 sphinx>=1.4
 ipykernel

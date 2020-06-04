@@ -40,12 +40,13 @@ import pandas as pd
 import statsmodels.formula.api as smf 
 import scipy.ndimage.filters as spf
 import datetime
-from astral import Location
+from astral import LocationInfo
+from astral.sun import sun
 import hydroeval as he
 
 # function to calculate change in soil moisture as root water uptake
 
-def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mintime=3.5):
+def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdiffs=0.25, mintime=3.5):
     r"""Calulate a daily root water uptake estimate from a soil moisture time series
 
     Returns a data frame with time series of daily RWU estimates and daily evaluation
@@ -60,6 +61,8 @@ def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mi
         latitude of location (degree)
     lon : float 
         longitude of location (degree)
+    elev : float
+        elevation at location (m above msl)
     diffx : int
         number of time steps to evaluate change in moisture to (spans window)
     slope_diff : float
@@ -95,20 +98,21 @@ def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mi
     """
     
     # use astral to get sunrise/sunset time references as a function of the date    
-    l = Location()
+    l = LocationInfo()
     l.latitude = lat
     l.longitude = lon
     l.timezone = str(ts.index.tz)
+    l.elevation = elev
     
     #sunrise sunset
     def sunr(dd):
         # give date and return time of sunrise
-        sunrise = pd.to_datetime(l.sun(date=dd)['sunrise'])
+        sunrise = pd.to_datetime(sun(l,date=dd)['sunrise'])
         return sunrise
         
     def suns(dd):
         # give date and return time of sunset
-        sunset = pd.to_datetime(l.sun(date=dd)['sunset'])
+        sunset = pd.to_datetime(sun(l,date=dd)['sunset'])
         return sunset
 
     # get unique days in time series
@@ -231,7 +235,7 @@ def fRWU(ts,lat=49.70764, lon=5.897638, diffx=3, slope_diff=3, maxdiffs=0.25, mi
     
     return RWU
 
-def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True):
+def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=200.):
     r"""Wrapper to quickly apply rootwater.rootwater.fRWU to a dataframe with soil moisture values.
 
     Returns three dataframes with RWU, RWU_without nocturnal correction, step shape NSE
@@ -247,7 +251,13 @@ def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True):
         its nomenclature
     safeRWU : bool
         flag if quality controls are applied when True
-
+    lat : float 
+        latitude of location (degree)
+    lon : float 
+        longitude of location (degree)
+    elev : float
+        elevation at location (m above msl)
+    
     Returns
     -------
     dummx : pandas.DataFrame
@@ -269,7 +279,7 @@ def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True):
     dummyc = dummyd.columns
     
     #first column
-    dummz = fRWU(dummyd[dummyc[0]])
+    dummz = fRWU(dummyd[dummyc[0]],lat=lat, lon=lon, elev=elev)
     if safeRWU:
         dummz.loc[dummz.step_control<1100,'rwu'] = np.nan #refuse values based on too much night increase and no day decrease
         dummz.loc[dummz.rwu<0.,'rwu'] = np.nan #refuse values less than zero
