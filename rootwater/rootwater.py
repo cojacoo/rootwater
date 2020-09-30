@@ -39,6 +39,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf 
 import scipy.ndimage.filters as spf
+from scipy.signal import savgol_filter
 import datetime
 from astral import LocationInfo
 from astral.sun import sun
@@ -136,8 +137,9 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
             # find first steps of not declining soil moisture after sunset
             tsx = dif_ts.loc[suns(dd-datetime.timedelta(hours=24))-datetime.timedelta(hours=5):suns(dd)+datetime.timedelta(hours=2)]
             stopRWU = tsx.index[np.where(tsx.values >=0)[0][0]]
-            startRWU = tsx.index[np.where(tsx.values <=-0.02)[0][np.where(tsx.values <=-0.02)[0]>np.where(tsx.values >=0)[0][0]][0]-1]
-            stop2RWU = tsx.index[np.where(tsx.values > 0)[0][np.where(tsx.values > 0)[0] > np.where(tsx.values <=-0.02)[0][np.where(tsx.values <=-0.02)[0]>np.where(tsx.values >=0)[0][0]][0]][0]]
+            stop2RWU = tsx.index[np.where(tsx.values > 0)[0][np.where(tsx.values > 0)[0] > np.where(tsx.values <=-0.01)[0][np.where(tsx.values <=-0.01)[0]>np.where(tsx.values >=0)[0][0]][0]][0]]
+            reflim = np.min([-0.001,tsx.loc[stopRWU:stop2RWU][tsx.loc[stopRWU:stop2RWU]<-0.001].quantile(0.95)])
+            startRWU = tsx.loc[stopRWU:].index[tsx.loc[stopRWU:].rolling(3,center=True).mean()<=reflim][0]
             return [stopRWU,startRWU,stop2RWU, 1]
         except:
             # in case soil moisture keeps falling without stepping assume 1 hour after sunset/sunrise but return warning flag
@@ -209,7 +211,7 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
         [dtin,dtout,dtix] = idstep_startstop(dd)
 
         # construct idealised step reference
-        idx = pd.date_range(dtin, dtix, freq='30min')
+        idx = pd.date_range(dtin, dtix, freq=freqx.index[0])
         dummy = pd.Series(np.zeros(len(idx))*np.nan,index = idx)
         
         dummy[dtin] = ts.loc[dtin]
@@ -231,11 +233,14 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
         return [rwu, rwu_nonight, resparamsx, res2paramsx, step_control, evalx, evaly, tin,tout,tix]
         
     for dd in ddx[:-1]:
-        RWU.loc[dd] = dayRWU2(dd)
+        try:
+            RWU.loc[dd] = dayRWU2(dd)
+        except:
+            print(str(dd)+' could not be processed.')
     
     return RWU
 
-def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=200.):
+def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=200., savgol=False):
     r"""Wrapper to quickly apply rootwater.rootwater.fRWU to a dataframe with soil moisture values.
 
     Returns three dataframes with RWU, RWU_without nocturnal correction, step shape NSE
@@ -277,6 +282,11 @@ def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=2
 
     dummyd = dummyd.tz_localize(tz)
     dummyc = dummyd.columns
+
+    if savgol:
+        #apply Savitzky-Golay filter to data to reduce noise
+        for i in dummyc:
+            dummyd[i] = savgol_filter(dummyd[i],15,1)
     
     #first column
     dummz = fRWU(dummyd[dummyc[0]],lat=lat, lon=lon, elev=elev)
