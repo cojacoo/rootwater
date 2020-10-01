@@ -194,10 +194,12 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
             step_control += 10
         if res.params.x / ((6.*3600.)/freqx.index[0].seconds) < 1/6.: #night slope shall be less than plus 1 vol.% per 6h
             step_control += 100
-        if res2.params.x < 0: #day slope must be negative 
+        if (res2.params.x < 0) & (res2.params.x / ((6.*3600.)/freqx.index[0].seconds) > -0.5/12.): #day slope must be negative but more than minus 0.5 vol.% per 12h
             step_control += 1000
         if res2.params.x < slope_diff*res.params.x: #day slope must be at least 3 times more steep than night (if night was negative)
             step_control += 1
+        if fuse.loc[tix]-ts.loc[tix]<2.: #rwu should not exceed 2 mm/day
+            step_control += 10000
         
         # only if step_control == 1111 fully valid results:
         rwu = fuse.loc[tix]-ts.loc[tix]
@@ -291,12 +293,12 @@ def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=2
     #first column
     dummz = fRWU(dummyd[dummyc[0]],lat=lat, lon=lon, elev=elev)
     if safeRWU:
-        dummz.loc[dummz.step_control<1100,'rwu'] = np.nan #refuse values based on too much night increase and no day decrease
+        dummz.loc[dummz.step_control<11111,'rwu'] = np.nan #refuse values based on too much night increase and no day decrease
         dummz.loc[dummz.rwu<0.,'rwu'] = np.nan #refuse values less than zero
     dummx = dummz.rwu
     
     if safeRWU:
-        dummz.loc[dummz.step_control<1100,'rwu_nonight'] = np.nan #refuse values based on too much night increase and no day decrease
+        dummz.loc[dummz.step_control<11111,'rwu_nonight'] = np.nan #refuse values based on too much night increase and no day decrease
         dummz.loc[dummz.rwu_nonight<0.,'rwu_nonight'] = np.nan #refuse values less than zero
     dummy = dummz.rwu_nonight
     dummc = dummz.eval_nse
@@ -305,12 +307,12 @@ def dfRWUc(dummyd,tz='Etc/GMT-1',safeRWU=True,lat=49.70764, lon=5.897638, elev=2
     for i in dummyc[1:]:
         dummz = fRWU(dummyd[i])
         if safeRWU:
-            dummz.loc[dummz.step_control<1100,'rwu'] = np.nan #refuse values based on too much night increase and no day decrease
+            dummz.loc[dummz.step_control<11111,'rwu'] = np.nan #refuse values based on too much night increase and no day decrease
             dummz.loc[dummz.rwu<0.,'rwu'] = np.nan #refuse values less than zero
         dummx = pd.concat([dummx,dummz.rwu],axis=1)
         
         if safeRWU:
-            dummz.loc[dummz.step_control<1100,'rwu_nonight'] = np.nan #refuse values based on too much night increase and no day decrease
+            dummz.loc[dummz.step_control<11111,'rwu_nonight'] = np.nan #refuse values based on too much night increase and no day decrease
             dummz.loc[dummz.rwu_nonight<0.,'rwu_nonight'] = np.nan #refuse values less than zero
         dummy = pd.concat([dummy,dummz.rwu_nonight], axis=1)
     
