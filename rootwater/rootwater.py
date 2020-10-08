@@ -161,9 +161,14 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
     
     def idstep_startstop(dd):
         # return astro reference times for idealised step
-        tin = ts.index[ts.index.get_loc(suns(dd-datetime.timedelta(hours=24))-datetime.timedelta(hours=1.5), method='nearest')]
-        tout = ts.index[ts.index.get_loc(sunr(dd)+datetime.timedelta(hours=2), method='nearest')]
-        tix = ts.index[ts.index.get_loc(suns(dd)-datetime.timedelta(hours=0.5), method='nearest')]
+        try:
+            tin = ts.index[ts.index.get_loc(suns(dd-datetime.timedelta(hours=24))-datetime.timedelta(hours=1.5), method='nearest')]
+            tout = ts.index[ts.index.get_loc(sunr(dd)+datetime.timedelta(hours=2), method='nearest')]
+            tix = ts.index[ts.index.get_loc(suns(dd)-datetime.timedelta(hours=0.5), method='nearest')]
+        except:
+            tin = ts.index[nearby(ts.index,suns(dd-datetime.timedelta(hours=24))-datetime.timedelta(hours=1.5))]
+            tout = ts.index[nearby(ts.index,sunr(dd)+datetime.timedelta(hours=2))]
+            tix = ts.index[nearby(ts.index,suns(dd)-datetime.timedelta(hours=0.5))]
         return [tin,tout,tix]
     
     def dayRWU(dd):
