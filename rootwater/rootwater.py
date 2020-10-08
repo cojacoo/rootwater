@@ -48,6 +48,7 @@ import hydroeval as he
 # helper
 def nearby(ts,tx):
     return(np.argmin(np.abs((ts-tx).seconds+(ts-tx).days*86400.)))
+    #likely never used...
 
 # function to calculate change in soil moisture as root water uptake
 
@@ -113,12 +114,12 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
     def sunr(dd):
         # give date and return time of sunrise
         sunrise = pd.to_datetime(sun(l,date=dd)['sunrise'])
-        return sunrise
+        return sunrise.tz_convert(l.timezone)
         
     def suns(dd):
         # give date and return time of sunset
         sunset = pd.to_datetime(sun(l,date=dd)['sunset'])
-        return sunset
+        return sunset.tz_convert(l.timezone)
 
     # get unique days in time series
     ddx = ts.resample('1d').mean().index.date
@@ -152,9 +153,9 @@ def fRWU(ts,lat=49.70764, lon=5.897638, elev=200., diffx=3, slope_diff=3, maxdif
                 startRWU = ts.index[ts.index.get_loc(sunr(dd)+datetime.timedelta(hours=2), method='nearest')]
                 stop2RWU = ts.index[ts.index.get_loc(suns(dd)+datetime.timedelta(hours=1), method='nearest')]
             except:
-                stopRWUx = tsx.index[nearby(tsx.index,suns(dd-datetime.timedelta(hours=24))+datetime.timedelta(hours=1))]
-                startRWUx = tsx.index[nearby(tsx.index,sunr(dd)+datetime.timedelta(hours=2))]
-                stop2RWUx = tsx.index[nearby(tsx.index,suns(dd)+datetime.timedelta(hours=1))]
+                stopRWU = tsx.index[nearby(tsx.index,suns(dd-datetime.timedelta(hours=24))+datetime.timedelta(hours=1))]
+                startRWU = tsx.index[nearby(tsx.index,sunr(dd)+datetime.timedelta(hours=2))]
+                stop2RWU = tsx.index[nearby(tsx.index,suns(dd)+datetime.timedelta(hours=1))]
 
             return [stopRWU,startRWU,stop2RWU, 0]
     
